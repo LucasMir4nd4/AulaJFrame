@@ -1,7 +1,7 @@
 package application;
 
 import entities.Cobra;
-import frame.Principal;
+import entities.frame.Principal;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

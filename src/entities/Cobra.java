@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Cobra extends JPanel {
 
-    private ArrayList<Point> corpo;
+    private final ArrayList<Point> corpo;
     private String direcao = "Direita";
 
     public Cobra(){

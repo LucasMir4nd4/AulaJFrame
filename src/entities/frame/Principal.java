@@ -1,4 +1,4 @@
-package frame;
+package entities.frame;
 import entities.Cobra;
 
 import javax.swing.*;
