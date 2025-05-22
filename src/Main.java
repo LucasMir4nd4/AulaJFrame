@@ -1,9 +1,22 @@
-
+import entities.Cobra;
 import frame.Principal;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Main {
     public static void main(String[] args) {
 
-        new Principal();
+        Cobra cobra = new Cobra();
+        Principal tela = new  Principal(cobra);
+
+        Timer timer = new Timer(150, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cobra.mover();     // atualiza a posição
+                tela.repaint();    // redesenha na tela
+            }
+        });
+        timer.start();
     }
 }
