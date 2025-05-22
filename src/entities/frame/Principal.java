@@ -14,21 +14,18 @@ public class Principal extends JFrame {
 
     public Principal(Cobra cobra) {
 
-
-        JFrame tela = new JFrame();
-
-        tela.setTitle("TELA");
-        tela.setSize(LARGURA_TELA, ALTURA_TELA);
-        tela.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        tela.setResizable(false);
-        tela.setLocationRelativeTo(null);
+        setTitle("TELA");
+        setSize(LARGURA_TELA, ALTURA_TELA);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
 
         ImageIcon icon = new ImageIcon("images/icon.png");
-        tela.setIconImage(icon.getImage());
+        setIconImage(icon.getImage());
 
         JLabel fundo = new JLabel(new ImageIcon("images/fundo.png"));
         fundo.setSize(1000, 1000);
-        tela.setContentPane(fundo);
+        setContentPane(fundo);
 
         JButton botao = new JButton("Jogar");
         botao.setSize(LARGURA_TELA / 5, ALTURA_TELA / 15);
@@ -45,15 +42,23 @@ public class Principal extends JFrame {
             botao.setFont(new Font("SansSerif", Font.PLAIN, 24));
         }
         this.cobra = cobra;
-        tela.setVisible(true);
+        setVisible(true);
         }
-
-        public void paintComponent(Graphics g) {
-
-            g.setColor(Color.GREEN);
-            for (Point p : cobra.getCorpo()) {
-                g.fillRect(p.x * 20, p.y * 20, 20, 20); // cada bloco 20x20 pixels
+        private class PainelJogo extends JPanel{
+            private Image fundo;
+            public PainelJogo(){
+                fundo = new ImageIcon("images/fundo.png").getImage();
             }
+            @Override
+            protected void paintComponent(Graphics gr) {
+
+                gr.drawImage(fundo, 0,0, getWidth(),getHeight(),this );
+
+                gr.setColor(Color.GREEN);
+                for (Point p : cobra.getCorpo()) {
+                    gr.fillRect(p.x * 20, p.y * 20, 20, 20); // cada bloco 20x20 pixels
+                }
+        }
 
     }
 }
