@@ -1,10 +1,12 @@
 package entities.frame;
+
 import entities.Cobra;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 
 public class Tela extends JFrame {
@@ -28,44 +30,65 @@ public class Tela extends JFrame {
         fundo.setSize(1000, 1000);
         setContentPane(fundo);
 
-        JButton botao = new JButton("Jogar");
-        botao.setSize(LARGURA_TELA / 5, ALTURA_TELA / 15);
 
-        botao.setBounds((LARGURA_TELA - botao.getWidth()) / 2, (ALTURA_TELA - botao.getHeight()) / 2, botao.getWidth(), botao.getHeight());
-
-        try {
-            Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fontes/PressStart2P-Regular.ttf"))
-                    .deriveFont(Font.PLAIN, 24f);
-            botao.setFont(font);
-        } catch (FontFormatException | IOException e) {
-            System.out.println("ERROR: " + e.getMessage());
-            // Se der erro, usa uma fonte padrão
-            botao.setFont(new Font("SansSerif", Font.PLAIN, 24));
-        }
 
         PainelJogo painel = new PainelJogo(cobra);
         setContentPane(painel);
 
         setVisible(true);
         }
-        private static class PainelJogo extends JPanel{
+        private static class PainelJogo extends JPanel implements KeyListener {
             private final Cobra cobra;
             private final Image fundo;
-            private final Timer timer;
+            private final JButton botao;
+            private Timer timer;
+
 
             public PainelJogo(Cobra cobra ){
 
                 this.cobra = cobra;
                 fundo = new ImageIcon("images/fundo.png").getImage();
 
+                setLayout(null);
+
+                botao = new JButton("Jogar");
+                botao.setSize(LARGURA_TELA / 5, ALTURA_TELA / 15);
+
+                botao.setBounds((LARGURA_TELA - botao.getWidth()) / 2, (ALTURA_TELA - botao.getHeight()) / 2, botao.getWidth(), botao.getHeight());
+
+                try {
+                    Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fontes/PressStart2P-Regular.ttf"))
+                            .deriveFont(Font.PLAIN, 24f);
+                    botao.setFont(font);
+                } catch (FontFormatException | IOException e) {
+                    System.out.println("ERROR: " + e.getMessage());
+                    // Se der erro, usa uma fonte padrão
+                    botao.setFont(new Font("SansSerif", Font.PLAIN, 24));
+                }
+
+                botao.addActionListener(e -> iniciarJogo());
+                add(botao);
+
                 setFocusable(true);
-                requestFocusInWindow();
+                requestFocus();
+                addKeyListener(this);
+
+
+            }
+
+            private void iniciarJogo(){
+                remove(botao);
+                revalidate();
+                repaint();
 
                 timer = new Timer(150, e -> {
                     cobra.mover();
                     repaint();
                 });
+
                 timer.start();
+
+                requestFocus();
             }
             @Override
             protected void paintComponent(Graphics gr) {
@@ -81,5 +104,39 @@ public class Tela extends JFrame {
         }
 
 
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int key = e.getKeyCode();
+                    switch (key){
+                        case KeyEvent.VK_LEFT:
+                            if (!cobra.getDirecao().equals("Direita")){
+                                cobra.setDirecao("Esquerda");
+                                break;
+                            }
+                        case KeyEvent.VK_RIGHT:
+                            if (!cobra.getDirecao().equals("Esquerda")){
+                                cobra.setDirecao("Direita");
+                                break;
+                            }
+                        case KeyEvent.VK_UP:
+                            if (!cobra.getDirecao().equals("Baixo")){
+                                cobra.setDirecao("Cima");
+                                break;
+                            }
+                        case  KeyEvent.VK_DOWN:
+                            if (!cobra.getDirecao().equals("Cima")){
+                                cobra.setDirecao("Baixo");
+                                break;
+                        }
+                }
+            }
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
     }
+
 }
+

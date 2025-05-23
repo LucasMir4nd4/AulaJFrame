@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
 
         Cobra cobra = new Cobra();
-        Tela tela = new Tela(cobra);
+        new Tela(cobra);
 
 
 
