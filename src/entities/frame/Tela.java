@@ -6,13 +6,13 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-public class Principal extends JFrame {
+public class Tela extends JFrame {
 
     private static final int LARGURA_TELA = 500;
     private static final int ALTURA_TELA = 500;
-    private Cobra cobra;
+    private final Cobra cobra;
 
-    public Principal(Cobra cobra) {
+    public Tela(Cobra cobra) {
 
         setTitle("TELA");
         setSize(LARGURA_TELA, ALTURA_TELA);
@@ -41,11 +41,16 @@ public class Principal extends JFrame {
             // Se der erro, usa uma fonte padrão
             botao.setFont(new Font("SansSerif", Font.PLAIN, 24));
         }
+
+        PainelJogo painel = new PainelJogo();
+        setContentPane(painel);
+
         this.cobra = cobra;
         setVisible(true);
         }
-        private class PainelJogo extends JPanel{
-            private Image fundo;
+        private static class PainelJogo extends JPanel{
+            private Cobra cobra;
+            private final Image fundo;
             public PainelJogo(){
                 fundo = new ImageIcon("images/fundo.png").getImage();
             }
