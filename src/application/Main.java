@@ -13,12 +13,7 @@ public class Main {
         Cobra cobra = new Cobra();
         Tela tela = new Tela(cobra);
 
-        Timer timer = new Timer(150, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                cobra.mover();     // atualiza a posição
-                tela.repaint();    // redesenha na tela
-            }
-        });
-        timer.start();
+
+
     }
 }

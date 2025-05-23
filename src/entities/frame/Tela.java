@@ -3,16 +3,17 @@ import entities.Cobra;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class Tela extends JFrame {
 
     private static final int LARGURA_TELA = 500;
     private static final int ALTURA_TELA = 500;
-    private final Cobra cobra;
 
     public Tela(Cobra cobra) {
+
 
         setTitle("TELA");
         setSize(LARGURA_TELA, ALTURA_TELA);
@@ -33,7 +34,7 @@ public class Tela extends JFrame {
         botao.setBounds((LARGURA_TELA - botao.getWidth()) / 2, (ALTURA_TELA - botao.getHeight()) / 2, botao.getWidth(), botao.getHeight());
 
         try {
-            Font font = Font.createFont(Font.TRUETYPE_FONT, new File("AulaJFrame/src/fontes/PressStart2P-Regular.ttf"))
+            Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fontes/PressStart2P-Regular.ttf"))
                     .deriveFont(Font.PLAIN, 24f);
             botao.setFont(font);
         } catch (FontFormatException | IOException e) {
@@ -42,20 +43,34 @@ public class Tela extends JFrame {
             botao.setFont(new Font("SansSerif", Font.PLAIN, 24));
         }
 
-        PainelJogo painel = new PainelJogo();
+        PainelJogo painel = new PainelJogo(cobra);
         setContentPane(painel);
 
-        this.cobra = cobra;
         setVisible(true);
         }
         private static class PainelJogo extends JPanel{
-            private Cobra cobra;
+            private final Cobra cobra;
             private final Image fundo;
-            public PainelJogo(){
+            private final Timer timer;
+
+            public PainelJogo(Cobra cobra ){
+
+                this.cobra = cobra;
                 fundo = new ImageIcon("images/fundo.png").getImage();
+
+                setFocusable(true);
+                requestFocusInWindow();
+
+                timer = new Timer(150, e -> {
+                    cobra.mover();
+                    repaint();
+                });
+                timer.start();
             }
             @Override
             protected void paintComponent(Graphics gr) {
+
+                super.paintComponent(gr);
 
                 gr.drawImage(fundo, 0,0, getWidth(),getHeight(),this );
 
@@ -64,6 +79,7 @@ public class Tela extends JFrame {
                     gr.fillRect(p.x * 20, p.y * 20, 20, 20); // cada bloco 20x20 pixels
                 }
         }
+
 
     }
 }
