@@ -4,36 +4,31 @@ import entities.Cobra;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 
 public class Tela extends JFrame {
 
-    private static final int LARGURA_TELA = 500;
-    private static final int ALTURA_TELA = 500;
+    private static final int LARGURA_TELA = 600;
+    private static final int ALTURA_TELA = 600;
 
     public Tela(Cobra cobra) {
 
-
+        //CONFIGURAÇÕES DA TELA
         setTitle("TELA");
         setSize(LARGURA_TELA, ALTURA_TELA);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLocationRelativeTo(null);
 
-        ImageIcon icon = new ImageIcon("images/icon.png");
+        ImageIcon icon = new ImageIcon("src/images/icon.png");
         setIconImage(icon.getImage());
-
-        JLabel fundo = new JLabel(new ImageIcon("images/fundo.png"));
-        fundo.setSize(1000, 1000);
-        setContentPane(fundo);
-
 
 
         PainelJogo painel = new PainelJogo(cobra);
         setContentPane(painel);
+
 
         setVisible(true);
         }
@@ -41,13 +36,12 @@ public class Tela extends JFrame {
             private final Cobra cobra;
             private final Image fundo;
             private final JButton botao;
-            private Timer timer;
 
 
             public PainelJogo(Cobra cobra ){
 
                 this.cobra = cobra;
-                fundo = new ImageIcon("images/fundo.png").getImage();
+                fundo = new ImageIcon("src/images/fundo.png").getImage();
 
                 setLayout(null);
 
@@ -57,7 +51,7 @@ public class Tela extends JFrame {
                 botao.setBounds((LARGURA_TELA - botao.getWidth()) / 2, (ALTURA_TELA - botao.getHeight()) / 2, botao.getWidth(), botao.getHeight());
 
                 try {
-                    Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/fontes/PressStart2P-Regular.ttf"))
+                    Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/resources/font/PressStart2P-Regular.ttf"))
                             .deriveFont(Font.PLAIN, 24f);
                     botao.setFont(font);
                 } catch (FontFormatException | IOException e) {
@@ -73,7 +67,6 @@ public class Tela extends JFrame {
                 requestFocus();
                 addKeyListener(this);
 
-
             }
 
             private void iniciarJogo(){
@@ -81,14 +74,14 @@ public class Tela extends JFrame {
                 revalidate();
                 repaint();
 
-                timer = new Timer(150, e -> {
+                Timer timer = new Timer(150, e -> {
                     cobra.mover();
                     repaint();
                 });
 
                 timer.start();
 
-                requestFocus();
+                requestFocusInWindow();
             }
             @Override
             protected void paintComponent(Graphics gr) {
@@ -111,23 +104,23 @@ public class Tela extends JFrame {
                         case KeyEvent.VK_LEFT:
                             if (!cobra.getDirecao().equals("Direita")){
                                 cobra.setDirecao("Esquerda");
-                                break;
                             }
+                            break;
                         case KeyEvent.VK_RIGHT:
                             if (!cobra.getDirecao().equals("Esquerda")){
                                 cobra.setDirecao("Direita");
-                                break;
                             }
+                            break;
                         case KeyEvent.VK_UP:
                             if (!cobra.getDirecao().equals("Baixo")){
                                 cobra.setDirecao("Cima");
-                                break;
                             }
+                            break;
                         case  KeyEvent.VK_DOWN:
                             if (!cobra.getDirecao().equals("Cima")){
                                 cobra.setDirecao("Baixo");
-                                break;
-                        }
+                            }
+                            break;
                 }
             }
             @Override
