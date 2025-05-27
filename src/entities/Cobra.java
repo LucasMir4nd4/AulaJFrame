@@ -7,10 +7,11 @@ import java.util.ArrayList;
 public class Cobra extends JPanel {
 
     private final ArrayList<Point> corpo;
-    private String direcao = "Direita";
+    private Direcao direcao = Direcao.DIREITA;
 
 
-    public Cobra(){
+    public Cobra(Direcao direcao){
+        this.direcao = Direcao.DIREITA;
         corpo = new ArrayList<>();
         corpo.add(new Point(5, 5));  // cabeça
         corpo.add(new Point(4, 5));  // corpo
@@ -26,10 +27,10 @@ public class Cobra extends JPanel {
         Point nova = new Point(cabeca);
 
         switch (direcao){
-            case "Cima": nova.y -= 1;break;
-            case "Baixo": nova.y += 1;break;
-            case "Direita": nova.x += 1;break;
-            case "Esquerda": nova.x -= 1;break;
+            case CIMA: nova.y -= 1;break;
+            case BAIXO: nova.y += 1;break;
+            case DIREITA: nova.x += 1;break;
+            case ESQUERDA: nova.x -= 1;break;
         }
 
 
@@ -42,12 +43,19 @@ public class Cobra extends JPanel {
     public ArrayList<Point> getCorpo() {
         return corpo;
     }
+    public Point getCabeca(){
+        return corpo.getFirst();
+    }
 
-    public void setDirecao(String direcao) {
+    public void crescer(){
+        Point cauda = corpo.get(corpo.size() - 1);
+        corpo.add(new Point(cauda));
+    }
+    public void setDirecao(Direcao direcao) {
         this.direcao = direcao;
     }
 
-    public String getDirecao() {
-        return direcao;
+    public Direcao getDirecao() {
+        return direcao != null? direcao : Direcao.DIREITA;
     }
 }

@@ -1,23 +1,34 @@
 package entities.frame;
 
 import entities.Cobra;
+import entities.Direcao;
+import entities.Fruta;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class Tela extends JFrame {
 
-    private static final int LARGURA_TELA = 600;
-    private static final int ALTURA_TELA = 600;
+    public static final int LARGURA_TELA = 600;
+    public static final int ALTURA_TELA = 600;
+    public static final int NUM_BLOCOS = 20;
+    public  static  final int TAMANHO_BLOCO = LARGURA_TELA/NUM_BLOCOS;
 
-    public Tela(Cobra cobra) {
 
-        //CONFIGURAÃ‡Ã•ES DA TELA
-        setTitle("TELA");
-        setSize(LARGURA_TELA, ALTURA_TELA);
+
+    public Tela(Cobra cobra, Fruta fruta) {
+
+
+
+        //CONFIGURAÇÕES DA TELA
+        setTitle("Snake Game");
+        PainelJogo painel = new PainelJogo(cobra,fruta);
+        setContentPane(painel);
+        pack();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLocationRelativeTo(null);
@@ -26,108 +37,149 @@ public class Tela extends JFrame {
         setIconImage(icon.getImage());
 
 
-        PainelJogo painel = new PainelJogo(cobra);
-        setContentPane(painel);
 
 
         setVisible(true);
         }
         private static class PainelJogo extends JPanel implements KeyListener {
             private final Cobra cobra;
+            private final Fruta fruta;
             private final Image fundo;
             private final JButton botao;
+            private boolean rodando = false;
+            boolean podeMudarDirecao = true;
+            private final Timer timer;
 
 
-            public PainelJogo(Cobra cobra ){
+            public PainelJogo(Cobra cobra, Fruta fruta){
 
                 this.cobra = cobra;
+                this.fruta = fruta;
+
+                setPreferredSize(new Dimension(LARGURA_TELA, ALTURA_TELA));
+
+
+                timer = new Timer(150, _ -> {
+                    if (rodando){
+                        cobra.mover();
+                        podeMudarDirecao = true;
+                        Point cabeca = cobra.getCabeca();
+                        Point posFruta = fruta.getFruta();
+
+                        if (cabeca.equals(posFruta)){
+
+                            System.out.println("Comeu a Fruta");
+                            cobra.crescer();
+                            fruta.gerarNovaFruta();
+                        }
+                        repaint();
+                    }
+                });
+
                 fundo = new ImageIcon("src/images/fundo.png").getImage();
 
                 setLayout(null);
 
-                botao = new JButton("Jogar");
-                botao.setSize(LARGURA_TELA / 5, ALTURA_TELA / 15);
+                //DIFINE O BOTÂO
+                ImageIcon imagemBotao = new ImageIcon ("src/images/ImagemBotao1.png");
+                botao = new JButton("Jogar", imagemBotao);
 
-                botao.setBounds((LARGURA_TELA - botao.getWidth()) / 2, (ALTURA_TELA - botao.getHeight()) / 2, botao.getWidth(), botao.getHeight());
-
-                try {
-                    Font font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/resources/font/PressStart2P-Regular.ttf"))
-                            .deriveFont(Font.PLAIN, 24f);
-                    botao.setFont(font);
-                } catch (FontFormatException | IOException e) {
-                    System.out.println("ERROR: " + e.getMessage());
-                    // Se der erro, usa uma fonte padrÃ£o
-                    botao.setFont(new Font("SansSerif", Font.PLAIN, 24));
-                }
-
-                botao.addActionListener(e -> iniciarJogo());
                 add(botao);
 
-                setFocusable(true);
+                //DEFINE AS PROPRIEDADES DO BOTÃO
+                botao.setHorizontalTextPosition(SwingConstants.CENTER); // texto centralizado na horizontal
+                botao.setVerticalTextPosition(SwingConstants.CENTER);   // texto centralizado na vertical
+                botao.setContentAreaFilled(false);  // remove fundo padrão do botão
+                botao.setSize(200,70);
+                botao.setFont(carregarFont());
+                botao.setBorderPainted(false);
+                botao.setForeground(Color.WHITE);
+
+
+
+                botao.addActionListener(_ -> iniciarJogo());
+
+                SwingUtilities.invokeLater(()->{
+                    int x = ((LARGURA_TELA - botao.getWidth())/2)-6;
+                    int y = ((ALTURA_TELA - botao.getHeight())/2)-6;
+                    botao.setBounds(x, y, botao.getWidth(), botao.getHeight());
+
+                });
+
                 requestFocus();
                 addKeyListener(this);
+
+                setFocusable(true);
+                SwingUtilities.invokeLater(this::requestFocusInWindow);
 
             }
 
             private void iniciarJogo(){
+
                 remove(botao);
+                rodando = true;
+                timer.start();
                 revalidate();
                 repaint();
-
-                Timer timer = new Timer(150, e -> {
-                    cobra.mover();
-                    repaint();
-                });
-
-                timer.start();
 
                 requestFocusInWindow();
             }
             @Override
-            protected void paintComponent(Graphics gr) {
-
+            public void paintComponent(Graphics gr) {
                 super.paintComponent(gr);
-
                 gr.drawImage(fundo, 0,0, getWidth(),getHeight(),this );
 
-                gr.setColor(Color.GREEN);
-                for (Point p : cobra.getCorpo()) {
-                    gr.fillRect(p.x * 20, p.y * 20, 20, 20); // cada bloco 20x20 pixels
+                if (rodando){
+                    fruta.desenharFruta(gr);
+                    //PINTA A COBRA
+                    gr.setColor(Color.BLACK);
+                    for (Point p : cobra.getCorpo()) {
+                        gr.fillRect(p.x * TAMANHO_BLOCO, p.y * TAMANHO_BLOCO, TAMANHO_BLOCO, TAMANHO_BLOCO); // cada bloco 20x20 pixels
+                    }
+
                 }
+
         }
 
 
             @Override
             public void keyPressed(KeyEvent e) {
+                Direcao direcaoAtual = cobra.getDirecao();
+                Direcao novaDirecao = null;
+
+
                 int key = e.getKeyCode();
+                    //SETAS
                     switch (key){
-                        case KeyEvent.VK_LEFT:
-                            if (!cobra.getDirecao().equals("Direita")){
-                                cobra.setDirecao("Esquerda");
-                            }
-                            break;
-                        case KeyEvent.VK_RIGHT:
-                            if (!cobra.getDirecao().equals("Esquerda")){
-                                cobra.setDirecao("Direita");
-                            }
-                            break;
-                        case KeyEvent.VK_UP:
-                            if (!cobra.getDirecao().equals("Baixo")){
-                                cobra.setDirecao("Cima");
-                            }
-                            break;
-                        case  KeyEvent.VK_DOWN:
-                            if (!cobra.getDirecao().equals("Cima")){
-                                cobra.setDirecao("Baixo");
-                            }
-                            break;
-                }
+                        case KeyEvent.VK_A , KeyEvent.VK_LEFT-> novaDirecao = Direcao.ESQUERDA;
+                        case KeyEvent.VK_D , KeyEvent.VK_RIGHT-> novaDirecao = Direcao.DIREITA;
+                        case KeyEvent.VK_W , KeyEvent.VK_UP-> novaDirecao = Direcao.CIMA;
+                        case KeyEvent.VK_S , KeyEvent.VK_DOWN-> novaDirecao = Direcao.BAIXO;
+                    }
+                    if (podeMudarDirecao && novaDirecao != null && novaDirecao != direcaoAtual.oposta() ){
+                        cobra.setDirecao(novaDirecao);
+                        podeMudarDirecao = false;
+                    }
             }
             @Override
             public void keyTyped(KeyEvent e) {
             }
             @Override
             public void keyReleased(KeyEvent e) {
+            }
+            // CONFIGURAÇÕES DA FONTE
+            private Font carregarFont(){
+                try (InputStream fontStream = getClass().getResourceAsStream("/font/PressStart2P-Regular.ttf")) {
+                    if (fontStream != null) {
+                        return Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(Font.PLAIN, 24f);
+                    } else {
+                        System.out.println(" Fonte não encontrada.");
+                    }
+                } catch (FontFormatException | IOException e) {
+                    System.out.println("Erro ao carregar a fonte: " + e.getMessage());
+                }
+                return new Font("SansSerif", Font.PLAIN, 24);
+
             }
     }
 
